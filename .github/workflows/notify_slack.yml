@@ -1,0 +1,23 @@
+name: Centralized Slack Notification
+
+on: 
+  workflow_dispatch:
+    inputs:
+      repositoryName:
+        required: true
+        description: 'Name of the repository'
+      workflowName:
+        required: true
+        description: 'Name of the workflow'
+      commits:
+        required: false
+        description: 'List of recent commits'
+
+jobs:
+  notify-slack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send message to Slack via Webhook
+        run: |
+          COMMIT_MESSAGES=$(echo "${{ github.event.inputs.commits }}" | sed 's/\\n/\\n/g')
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"El workflow `${{ github.event.inputs.workflowName }}` se completó exitosamente en el repositorio `${{ github.event.inputs.repositoryName }}`. Últimos commits:\n$COMMIT_MESSAGES"}' ${{ secrets.WEBHOOK_URL }}
