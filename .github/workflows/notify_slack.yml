@@ -19,10 +19,27 @@ jobs:
           IFS=$'\n' read -r -a commit_array <<< "${{ github.event.inputs.commits }}"
           commits_formatted=""
           for commit in "${commit_array[@]}"; do
-            commits_formatted+="- $commit\n"
+            commits_formatted+="• $commit\n"
           done
           JSON_PAYLOAD=$(jq -n \
-                          --arg text "El deploy del repositorio ${{ github.event.inputs.repositoryName }} ha sido exitoso! Estos son sus commits:\n$commits_formatted" \
-                          '{text: $text}')
+                          --arg repoName "${{ github.event.inputs.repositoryName }}" \
+                          --arg commits "$commits_formatted" \
+                          '{
+                            "blocks": [
+                              {
+                                "type": "section",
+                                "text": {
+                                  "type": "mrkdwn",
+                                  "text": "*El deploy del repositorio* `<\($repoName)|\($repoName)>` *ha sido exitoso! Estos son sus commits:*"
+                                }
+                              },
+                              {
+                                "type": "section",
+                                "text": {
+                                  "type": "mrkdwn",
+                                  "text": "\($commits)"
+                                }
+                              }
+                            ]
+                          }')
           curl -X POST -H 'Content-type: application/json' --data "$JSON_PAYLOAD" ${{ secrets.WEBHOOK_URL }}
-
