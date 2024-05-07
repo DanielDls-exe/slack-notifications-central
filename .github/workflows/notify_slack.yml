@@ -35,7 +35,7 @@ jobs:
                                 "type": "section",
                                 "text": {
                                   "type": "mrkdwn",
-                                  "text": "*El deploy del repositorio* `<\($repoName)|\($repoName)>` *ha sido exitoso! Estos son sus commits:*"
+                                  "text": "*El deploy del repositorio* `<\($repoName)>` *ha sido exitoso! Estos son sus commits:*"
                                 }
                               },
                               {
