@@ -15,18 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send message to Slack via Webhook
-          run: |
-            IFS=$'\n' read -r -d '' -a commit_array <<< "${{ github.event.inputs.commits }}"
-            commits_formatted=""
-            echo "Commits Array: ${commit_array[*]}"
-            for commit in "${commit_array[@]}"; do
-              echo "Processing Commit: $commit"
-              commits_formatted+="- $commit\n"
-            done
-            echo "Formatted Commits: $commits_formatted"
-            JSON_PAYLOAD=$(jq -n \
-                            --arg text "El deploy del repositorio ${{ github.event.inputs.repositoryName }} ha sido exitoso! Estos son sus commits:\n$commits_formatted" \
-                            '{text: $text}')
-            echo "JSON Payload: $JSON_PAYLOAD"
-            curl -X POST -H 'Content-type: application/json' --data "$JSON_PAYLOAD" ${{ secrets.WEBHOOK_URL }}
-
+        run: |
+          IFS=$'\n' read -r -d '' -a commit_array <<< "${{ github.event.inputs.commits }}"
+          commits_formatted=""
+          for commit in "${commit_array[@]}"; do
+            commits_formatted+="- $commit\n"
+          done
+          JSON_PAYLOAD=$(jq -n \
+                          --arg text "El deploy del repositorio ${{ github.event.inputs.repositoryName }} ha sido exitoso! Estos son sus commits:\n$commits_formatted" \
+                          '{text: $text}')
+          curl -X POST -H 'Content-type: application/json' --data "$JSON_PAYLOAD" ${{ secrets.WEBHOOK_URL }}
