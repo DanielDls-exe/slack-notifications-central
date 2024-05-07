@@ -20,4 +20,4 @@ jobs:
       - name: Send message to Slack via Webhook
         run: |
           COMMIT_MESSAGES=$(echo "${{ github.event.inputs.commits }}" | sed 's/\\n/\\n/g')
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"El deploy en el repositorio `${{ github.event.inputs.repositoryName }}` fue exitoso!.' ${{ secrets.WEBHOOK_URL }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"El workflow `${{ github.event.inputs.workflowName }}` se completó exitosamente en el repositorio `${{ github.event.inputs.repositoryName }}`. Últimos commits:\n$COMMIT_MESSAGES"}' ${{ secrets.WEBHOOK_URL }}
