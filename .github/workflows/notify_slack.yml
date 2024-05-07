@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Send message to Slack via Webhook
         run: |
-          IFS=$'\n' read -r -d '' -a commit_array <<< "${{ github.event.inputs.commits }}"
+          IFS=$'\n' read -r -a commit_array <<< "${{ github.event.inputs.commits }}"
           commits_formatted=""
           for commit in "${commit_array[@]}"; do
             commits_formatted+="- $commit\n"
@@ -25,3 +25,4 @@ jobs:
                           --arg text "El deploy del repositorio ${{ github.event.inputs.repositoryName }} ha sido exitoso! Estos son sus commits:\n$commits_formatted" \
                           '{text: $text}')
           curl -X POST -H 'Content-type: application/json' --data "$JSON_PAYLOAD" ${{ secrets.WEBHOOK_URL }}
+
