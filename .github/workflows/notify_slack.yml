@@ -6,8 +6,11 @@ on:
       repositoryName:
         required: true
         description: 'Name of the repository'
-      commits:
+      workflowName:
         required: true
+        description: 'Name of the workflow'
+      commits:
+        required: false
         description: 'List of recent commits'
 
 jobs:
@@ -16,12 +19,5 @@ jobs:
     steps:
       - name: Send message to Slack via Webhook
         run: |
-          IFS=$'\n' read -r -d '' -a commit_array <<< "${{ github.event.inputs.commits }}"
-          commits_formatted=""
-          for commit in "${commit_array[@]}"; do
-            commits_formatted+="- $commit\n"
-          done
-          JSON_PAYLOAD=$(jq -n \
-                          --arg text "El deploy del repositorio ${{ github.event.inputs.repositoryName }} ha sido exitoso! Estos son sus commits:\n$commits_formatted" \
-                          '{text: $text}')
-          curl -X POST -H 'Content-type: application/json' --data "$JSON_PAYLOAD" ${{ secrets.WEBHOOK_URL }}
+          COMMIT_MESSAGES=$(echo "${{ github.event.inputs.commits }}" | sed 's/\\n/\\n/g')
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"El deploy en el repositorio `${{ github.event.inputs.repositoryName }}` fue exitoso!.' ${{ secrets.WEBHOOK_URL }}
