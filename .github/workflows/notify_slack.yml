@@ -18,8 +18,13 @@ jobs:
         run: |
           IFS=$'\n' read -r -a commit_array <<< "${{ github.event.inputs.commits }}"
           commits_formatted=""
-          for commit in "${commit_array[@]}"; do
-            commits_formatted+="• $commit\n"
+          for i in "${!commit_array[@]}"; do
+            commit="${commit_array[$i]}"
+            if [[ $i -lt $((${#commit_array[@]} - 1)) ]]; then
+              commits_formatted+="• $commit\n"
+            else
+              commits_formatted+="• $commit"
+            fi
           done
           JSON_PAYLOAD=$(jq -n \
                           --arg repoName "${{ github.event.inputs.repositoryName }}" \
